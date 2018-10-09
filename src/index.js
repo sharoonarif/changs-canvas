@@ -11,13 +11,18 @@ const drawParameters = {
 
 let currentAnimationFrameRequest;
 
-const main = () => {
+const initHandlers = () => {
 	document.getElementById('reset-btn').addEventListener('click', reset);
 	document.getElementById('stop-btn').addEventListener('click', stop);
 	document.getElementById('start-btn').addEventListener('click', start);
+	document.getElementById('clear-btn').addEventListener('click', clear);
 	document.getElementById('x-move').addEventListener('change', updateDrawParameter.bind(this, 'xDirection'));
 	document.getElementById('y-move').addEventListener('change', updateDrawParameter.bind(this, 'yDirection'));
 	document.getElementById('line-width').addEventListener('change', updateDrawParameter.bind(this, 'lineWidth'));
+};
+
+const main = () => {
+	initHandlers();
 	const canvas = document.getElementById('changs-canvas');
 	canvas.width = width;
 	canvas.height = height;
@@ -54,9 +59,13 @@ const start = () => {
 	draw(getContext());
 };
 
-const reset = () => {
+const clear = () => {
 	const context = getContext();
 	context.clearRect(0, 0, 800, 600);
+};
+
+const reset = () => {
+	clear();
 	drawParameters.xDirection = 5;
 	drawParameters.yDirection = 5;
 	drawParameters.lineWidth = 3;
