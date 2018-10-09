@@ -1,13 +1,7 @@
 
 const width = 800;
 const height = 600;
-const drawParameters = {
-	xDirection: 5,
-	yDirection: 5,
-	lineWidth: 3,
-	currentX: width * Math.random(),
-	currentY: height * Math.random()
-};
+const drawParameters = {};
 
 let currentAnimationFrameRequest;
 
@@ -28,6 +22,7 @@ const main = () => {
 	canvas.height = height;
 
 	const context = canvas.getContext('2d');
+	reset();
 	draw(context);
 };
 
@@ -75,6 +70,10 @@ const reset = () => {
 	document.getElementById('x-move').value = 5;
 	document.getElementById('y-move').value = 5;
 	document.getElementById('line-width').value = 3;
+
+	if (!currentAnimationFrameRequest) {
+		draw(getContext());
+	}
 };
 
 const draw = context => {
@@ -100,6 +99,7 @@ const draw = context => {
 	drawParameters.currentY = newY + drawParameters.yDirection;
 
 	context.lineTo(drawParameters.currentX, drawParameters.currentY);
+
 	context.stroke();
 	context.closePath();
 	currentAnimationFrameRequest = requestAnimationFrame(draw.bind(this, context));
