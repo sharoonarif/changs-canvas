@@ -21,9 +21,7 @@ const main = () => {
 	canvas.width = width;
 	canvas.height = height;
 
-	const context = canvas.getContext('2d');
 	reset();
-	draw(context);
 };
 
 const getContext = () => {
