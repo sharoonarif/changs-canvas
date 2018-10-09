@@ -1,10 +1,23 @@
+
 const width = 800;
 const height = 600;
+const drawParameters = {
+	xDirection: 5,
+	yDirection: 5,
+	lineWidth: 3,
+	currentX: width * Math.random(),
+	currentY: height * Math.random()
+};
+
+let currentAnimationFrameRequest;
 
 const main = () => {
 	document.getElementById('reset-btn').addEventListener('click', reset);
-	document.getElementById('x-move').addEventListener('change', updateX);
-	document.getElementById('y-move').addEventListener('change', updateY);
+	document.getElementById('stop-btn').addEventListener('click', stop);
+	document.getElementById('start-btn').addEventListener('click', start);
+	document.getElementById('x-move').addEventListener('change', updateDrawParameter.bind(this, 'xDirection'));
+	document.getElementById('y-move').addEventListener('change', updateDrawParameter.bind(this, 'yDirection'));
+	document.getElementById('line-width').addEventListener('change', updateDrawParameter.bind(this, 'lineWidth'));
 	const canvas = document.getElementById('changs-canvas');
 	canvas.width = width;
 	canvas.height = height;
@@ -18,62 +31,69 @@ const getContext = () => {
 	return canvas.getContext('2d');
 };
 
-let xDirection = 5;
-let yDirection = 5;
-const absoluteXDirection = Math.abs(xDirection);
-const absoluteYDirection = Math.abs(yDirection);
-
-const updateX = (e) => {
+const updateDrawParameter = (velocityProp, e) => {
 	const value = e.target.value;
-	console.log(value);
+
 	if (!value || isNaN(value) || !isFinite(value)) {
 		return;
 	}
 
-	xDirection = parseInt(value) * (xDirection < 0 ? -1 : 1);
+	drawParameters[velocityProp] =  parseInt(value) * (drawParameters[velocityProp] < 0 ? -1 : 1);
 };
 
-const updateY = (e) => {
-	const value = e.target.value;
-	console.log(value);
+const stop = () => {
+	cancelAnimationFrame(currentAnimationFrameRequest);
+	currentAnimationFrameRequest = null;
+};
 
-	if (!value || isNaN(value) || !isFinite(value)) {
+const start = () => {
+	if (currentAnimationFrameRequest) {
 		return;
 	}
 
-	yDirection = parseInt(value) * (yDirection < 0 ? -1 : 1);
+	draw(getContext());
 };
 
 const reset = () => {
 	const context = getContext();
 	context.clearRect(0, 0, 800, 600);
+	drawParameters.xDirection = 5;
+	drawParameters.yDirection = 5;
+	drawParameters.lineWidth = 3;
+	drawParameters.currentX = width * Math.random();
+	drawParameters.currentY = height * Math.random();
+
+	document.getElementById('x-move').value = 5;
+	document.getElementById('y-move').value = 5;
+	document.getElementById('line-width').value = 3;
 };
 
-const draw = (context, x, y) => {
-	// context.clearRect(0, 0, 800, 600);
+const draw = context => {
+	const { lineWidth } = drawParameters;
+
 	context.beginPath();
-	context.lineWidth = 10;
+	context.lineWidth = lineWidth;
 	context.strokeStyle = 'black';
 	
-	const newX = isNaN(x) ? width * Math.random() : x;
-	const newY = isNaN(y) ? height * Math.random() : y;
+	const newX = drawParameters.currentX;
+	const newY = drawParameters.currentY;
 	context.moveTo(newX, newY);
 
-	if (newX > (width - absoluteXDirection) || newX < absoluteYDirection) {
-		xDirection = xDirection * -1;
+	if (newX > (width - lineWidth) || newX < lineWidth) {
+		drawParameters.xDirection = drawParameters.xDirection * -1;
 	}
 
-	if (newY > (height - absoluteYDirection) || newY < absoluteYDirection) {
-		yDirection = yDirection * -1;
+	if (newY > (height - lineWidth) || newY < lineWidth) {
+		drawParameters.yDirection = drawParameters.yDirection * -1;
 	}
 
-	const movedToX = newX + xDirection;
-	const movedToY = newY + yDirection;
+	drawParameters.currentX = newX + drawParameters.xDirection;
+	drawParameters.currentY = newY + drawParameters.yDirection;
 
-	context.lineTo(movedToX, movedToY);
+	context.lineTo(drawParameters.currentX, drawParameters.currentY);
 	context.stroke();
 	context.closePath();
-	requestAnimationFrame(draw.bind(this, context, movedToX, movedToY));
+	currentAnimationFrameRequest = requestAnimationFrame(draw.bind(this, context));
 };
 
 document.addEventListener('DOMContentLoaded', main);
