@@ -56,3 +56,18 @@ button {
 	text-transform: uppercase;
 	font-weight: bold;
 }
+
+#color-picker {
+	display: flex;
+	justify-content: space-between;
+	width: 80%;
+	padding: 20px;
+}
+
+.color-box {
+	width: 60px;
+	height: 60px;
+	border-radius: 20px;
+	box-shadow: 1px 1px 1px black;
+	cursor: pointer;
+}

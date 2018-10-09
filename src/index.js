@@ -10,9 +10,14 @@ const initHandlers = () => {
 	document.getElementById('stop-btn').addEventListener('click', stop);
 	document.getElementById('start-btn').addEventListener('click', start);
 	document.getElementById('clear-btn').addEventListener('click', clear);
-	document.getElementById('x-move').addEventListener('change', updateDrawParameter.bind(this, 'xDirection'));
-	document.getElementById('y-move').addEventListener('change', updateDrawParameter.bind(this, 'yDirection'));
-	document.getElementById('line-width').addEventListener('change', updateDrawParameter.bind(this, 'lineWidth'));
+	document.getElementById('x-move').addEventListener('change', updateVelocity.bind(this, 'xDirection'));
+	document.getElementById('y-move').addEventListener('change', updateVelocity.bind(this, 'yDirection'));
+	document.getElementById('line-width').addEventListener('change', updateVelocity.bind(this, 'lineWidth'));
+
+	const colorPicker = document.getElementById('color-picker');
+	for (const child of colorPicker.children) {
+		child.addEventListener('click', updateDrawParameter.bind(this, 'strokeColor', 'data-color'));
+	}
 };
 
 const main = () => {
@@ -29,7 +34,17 @@ const getContext = () => {
 	return canvas.getContext('2d');
 };
 
-const updateDrawParameter = (velocityProp, e) => {
+const updateDrawParameter = (propName, attribute, e) => {
+	const elementAttribute = e.target.attributes[attribute];
+
+	if (!elementAttribute || !elementAttribute.value) {
+		return;
+	}
+
+	drawParameters[propName] = elementAttribute.value;
+};
+
+const updateVelocity = (velocityProp, e) => {
 	const value = e.target.value;
 
 	if (!value || isNaN(value) || !isFinite(value)) {
@@ -64,6 +79,7 @@ const reset = () => {
 	drawParameters.lineWidth = 3;
 	drawParameters.currentX = width * Math.random();
 	drawParameters.currentY = height * Math.random();
+	drawParameters.strokeColor = 'black';
 
 	document.getElementById('x-move').value = 5;
 	document.getElementById('y-move').value = 5;
@@ -75,11 +91,11 @@ const reset = () => {
 };
 
 const draw = context => {
-	const { lineWidth } = drawParameters;
+	const { lineWidth, strokeColor } = drawParameters;
 
 	context.beginPath();
 	context.lineWidth = lineWidth;
-	context.strokeStyle = 'black';
+	context.strokeStyle = strokeColor || 'black';
 	
 	const newX = drawParameters.currentX;
 	const newY = drawParameters.currentY;
