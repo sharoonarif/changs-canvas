@@ -67,6 +67,11 @@ button {
 	padding: 20px;
 }
 
+input[type=range] {
+	padding: 0;
+	width: 100px;
+}
+
 .color-box {
 	width: 60px;
 	height: 60px;

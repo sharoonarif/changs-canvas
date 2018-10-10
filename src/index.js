@@ -15,6 +15,7 @@ const initHandlers = () => {
 	document.getElementById('line-width').addEventListener('change', updateVelocity.bind(this, 'lineWidth'));
 	document.getElementById('curved').addEventListener('change', toggleCurve.bind(this));
 	document.getElementById('curve-amount').addEventListener('change', updateDrawParameter.bind(this, 'curveAmount', target => parseInt(target.value)));
+	document.getElementById('opacity').addEventListener('change', updateDrawParameter.bind(this, 'opacity', target => parseFloat(target.value)));
 
 	const colorPicker = document.getElementById('color-picker');
 	for (const child of colorPicker.children) {
@@ -88,8 +89,9 @@ const clear = () => {
 const reset = () => {
 	clear();
 	const lineWidth = 1;
-	const curved = false;
 	const curveAmount = 1;
+	const opacity = 1;
+	const curved = false;
 	drawParameters.xDirection = 5;
 	drawParameters.yDirection = 5;
 	drawParameters.lineWidth = lineWidth;
@@ -99,12 +101,14 @@ const reset = () => {
 	drawParameters.curveMultiplier = 1;
 	drawParameters.curved = curved;
 	drawParameters.curveAmount = curveAmount;
+	drawParameters.opacity = opacity;
 
 	document.getElementById('x-move').value = 5;
 	document.getElementById('y-move').value = 5;
 	document.getElementById('line-width').value = lineWidth;
 	document.getElementById('curve-amount').value = curveAmount;
 	document.getElementById('curved').checked = curved;
+	document.getElementById('opacity').value = opacity;
 
 	if (!currentAnimationFrameRequest) {
 		draw(getContext());
@@ -112,10 +116,11 @@ const reset = () => {
 };
 
 const draw = context => {
-	const { lineWidth, strokeColor } = drawParameters;
+	const { lineWidth, strokeColor, opacity } = drawParameters;
 
 	context.lineWidth = lineWidth;
 	context.strokeStyle = strokeColor || 'black';
+	context.globalAlpha = opacity;
 	
 	const newX = drawParameters.currentX;
 	const newY = drawParameters.currentY;
