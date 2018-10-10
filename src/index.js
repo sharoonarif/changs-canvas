@@ -13,10 +13,12 @@ const initHandlers = () => {
 	document.getElementById('x-move').addEventListener('change', updateVelocity.bind(this, 'xDirection'));
 	document.getElementById('y-move').addEventListener('change', updateVelocity.bind(this, 'yDirection'));
 	document.getElementById('line-width').addEventListener('change', updateVelocity.bind(this, 'lineWidth'));
+	document.getElementById('curved').addEventListener('change', toggleCurve.bind(this));
+	document.getElementById('curve-amount').addEventListener('change', updateDrawParameter.bind(this, 'curveAmount', target => parseInt(target.value)));
 
 	const colorPicker = document.getElementById('color-picker');
 	for (const child of colorPicker.children) {
-		child.addEventListener('click', updateDrawParameter.bind(this, 'strokeColor', 'data-color'));
+		child.addEventListener('click', updateDrawParameter.bind(this, 'strokeColor', (target) => target.attributes['data-color'].value));
 	}
 };
 
@@ -36,14 +38,23 @@ const getContext = () => {
 	return canvas.getContext('2d');
 };
 
-const updateDrawParameter = (propName, attribute, e) => {
-	const elementAttribute = e.target.attributes[attribute];
+const toggleCurve = (e) => {
+	const checked = e.target.checked;
+	drawParameters.curved = checked;
 
-	if (!elementAttribute || !elementAttribute.value) {
+	const curveAmountControl = document.getElementById('curve-amount-control');
+	checked ? curveAmountControl.classList.remove('disabled') : curveAmountControl.classList.add('disabled');
+	curveAmountControl.querySelector('input').disabled = !checked;
+};
+
+const updateDrawParameter = (propName, valueSelector, e) => {
+	const value = valueSelector(e.target);
+
+	if (value === null || value === undefined) {
 		return;
 	}
 
-	drawParameters[propName] = elementAttribute.value;
+	drawParameters[propName] = value;
 };
 
 const updateVelocity = (velocityProp, e) => {
@@ -77,16 +88,23 @@ const clear = () => {
 const reset = () => {
 	clear();
 	const lineWidth = 1;
+	const curved = false;
+	const curveAmount = 1;
 	drawParameters.xDirection = 5;
 	drawParameters.yDirection = 5;
 	drawParameters.lineWidth = lineWidth;
 	drawParameters.currentX = width * Math.random();
 	drawParameters.currentY = height * Math.random();
 	drawParameters.strokeColor = 'black';
+	drawParameters.curveMultiplier = 1;
+	drawParameters.curved = curved;
+	drawParameters.curveAmount = curveAmount;
 
 	document.getElementById('x-move').value = 5;
 	document.getElementById('y-move').value = 5;
 	document.getElementById('line-width').value = lineWidth;
+	document.getElementById('curve-amount').value = curveAmount;
+	document.getElementById('curved').checked = curved;
 
 	if (!currentAnimationFrameRequest) {
 		draw(getContext());
@@ -96,13 +114,11 @@ const reset = () => {
 const draw = context => {
 	const { lineWidth, strokeColor } = drawParameters;
 
-	context.beginPath();
 	context.lineWidth = lineWidth;
 	context.strokeStyle = strokeColor || 'black';
 	
 	const newX = drawParameters.currentX;
 	const newY = drawParameters.currentY;
-	context.moveTo(newX, newY);
 
 	if (newX > (width - lineWidth) || newX < lineWidth) {
 		drawParameters.xDirection = drawParameters.xDirection * -1;
@@ -115,11 +131,52 @@ const draw = context => {
 	drawParameters.currentX = newX + drawParameters.xDirection;
 	drawParameters.currentY = newY + drawParameters.yDirection;
 
-	context.lineTo(drawParameters.currentX, drawParameters.currentY);
+	if (drawParameters.curved) {
+		drawCurveTo(context, { x: newX, y: newY }, { x: drawParameters.currentX, y: drawParameters.currentY });
+	}
+	else {
+		drawLineTo(context, { x: newX, y: newY }, { x: drawParameters.currentX, y: drawParameters.currentY });
+	}
+
+	currentAnimationFrameRequest = requestAnimationFrame(draw.bind(this, context));
+};
+
+const drawLineTo = (context, start, end) => {
+	context.beginPath();
+	context.moveTo(start.x, start.y);
+	context.lineTo(end.x, end.y);
+	context.stroke();
+	context.closePath();
+};
+
+const drawCurveTo = (context, start, end) => {
+	context.beginPath();
+	context.moveTo(start.x, start.y);
+
+	const midX = (start.x + end.x) / 2;
+	const midY = (start.y + end.y) / 2;
+
+	const xLength = end.x - start.x;
+	const yLength = end.y - start.y;
+
+	const gradient = xLength / yLength;
+
+	const offsetMidX = midX + ((drawParameters.curveAmount / 2) * gradient * drawParameters.curveMultiplier);
+	const offsetMidY = midY + ((drawParameters.curveAmount / 2) * gradient * drawParameters.curveMultiplier * (gradient > 0 ? -1 : 1));
+
+	context.bezierCurveTo(
+		offsetMidX,
+		offsetMidY,
+		offsetMidX,
+		offsetMidY,
+		end.x,
+		end.y
+	);
 
 	context.stroke();
 	context.closePath();
-	currentAnimationFrameRequest = requestAnimationFrame(draw.bind(this, context));
+
+	drawParameters.curveMultiplier = drawParameters.curveMultiplier * -1;
 };
 
 document.addEventListener('DOMContentLoaded', main);

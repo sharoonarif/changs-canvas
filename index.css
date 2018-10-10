@@ -74,3 +74,8 @@ button {
 	box-shadow: 1px 1px 1px black;
 	cursor: pointer;
 }
+
+#curve-amount-control.disabled {
+	cursor: default;
+	color: grey;
+}
