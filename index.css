@@ -9,7 +9,8 @@ body {
 }
 
 .some-app {
-	width: 800px;
+	width: 90vw;
+	max-width: 800px;
 	background-color: #3c3c3c;
 	color: white;
 	display: flex;
@@ -19,7 +20,8 @@ body {
 
 canvas {
 	width: 100%;
-	height: 600px;
+	height: 40vh;
+	max-height: 600px;
 	background-color: darkgray;
 	margin-top: 40px;
 }
@@ -27,8 +29,9 @@ canvas {
 input {
 	height: 30px;
 	padding: 4px 8px;
+	width: 50px;
+	box-sizing: border-box;
 }
-
 
 .controls, .control-btns {
 	display: flex;
@@ -60,7 +63,7 @@ button {
 #color-picker {
 	display: flex;
 	justify-content: space-between;
-	width: 80%;
+	width: 90%;
 	padding: 20px;
 }
 

@@ -1,6 +1,6 @@
 
-const width = 800;
-const height = 600;
+let width = 800;
+let height = 600;
 const drawParameters = {};
 
 let currentAnimationFrameRequest;
@@ -23,8 +23,10 @@ const initHandlers = () => {
 const main = () => {
 	initHandlers();
 	const canvas = document.getElementById('changs-canvas');
-	canvas.width = width;
-	canvas.height = height;
+	canvas.width = canvas.clientWidth;
+	canvas.height = canvas.clientHeight;
+	width = canvas.clientWidth;
+	height = canvas.clientHeight;
 
 	reset();
 };
@@ -69,21 +71,22 @@ const start = () => {
 
 const clear = () => {
 	const context = getContext();
-	context.clearRect(0, 0, 800, 600);
+	context.clearRect(0, 0, width, height);
 };
 
 const reset = () => {
 	clear();
+	const lineWidth = 1;
 	drawParameters.xDirection = 5;
 	drawParameters.yDirection = 5;
-	drawParameters.lineWidth = 3;
+	drawParameters.lineWidth = lineWidth;
 	drawParameters.currentX = width * Math.random();
 	drawParameters.currentY = height * Math.random();
 	drawParameters.strokeColor = 'black';
 
 	document.getElementById('x-move').value = 5;
 	document.getElementById('y-move').value = 5;
-	document.getElementById('line-width').value = 3;
+	document.getElementById('line-width').value = lineWidth;
 
 	if (!currentAnimationFrameRequest) {
 		draw(getContext());
@@ -104,11 +107,11 @@ const draw = context => {
 	if (newX > (width - lineWidth) || newX < lineWidth) {
 		drawParameters.xDirection = drawParameters.xDirection * -1;
 	}
-
+	
 	if (newY > (height - lineWidth) || newY < lineWidth) {
 		drawParameters.yDirection = drawParameters.yDirection * -1;
 	}
-
+	
 	drawParameters.currentX = newX + drawParameters.xDirection;
 	drawParameters.currentY = newY + drawParameters.yDirection;
 
