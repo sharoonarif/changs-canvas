@@ -35,7 +35,7 @@ input {
 
 .controls, .control-btns {
 	display: flex;
-	flex-flow: row;
+	flex-flow: wrap;
 	justify-content: center;
 	align-items: center;
 	width: 100%;
