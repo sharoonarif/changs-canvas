@@ -169,9 +169,7 @@ const drawCurveTo = (context, start, end) => {
 	const offsetMidX = midX + ((drawParameters.curveAmount / 2) * gradient * drawParameters.curveMultiplier);
 	const offsetMidY = midY + ((drawParameters.curveAmount / 2) * gradient * drawParameters.curveMultiplier * (gradient > 0 ? -1 : 1));
 
-	context.bezierCurveTo(
-		offsetMidX,
-		offsetMidY,
+	context.quadraticCurveTo(
 		offsetMidX,
 		offsetMidY,
 		end.x,
