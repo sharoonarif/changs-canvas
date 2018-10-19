@@ -1,6 +1,7 @@
-
+ 
 let width = 800;
 let height = 600;
+let rotate = 0;
 const drawParameters = {};
 
 let currentAnimationFrameRequest;
@@ -102,6 +103,12 @@ const reset = () => {
 	drawParameters.curved = curved;
 	drawParameters.curveAmount = curveAmount;
 	drawParameters.opacity = opacity;
+	drawParameters.circleRadius = 50;
+	drawParameters.circleStartX = 0;
+	drawParameters.circleStartY = 0;
+	drawParameters.pencilOffset = Math.random() * (drawParameters.circleRadius - 10);
+	drawParameters.direction = 1;
+	rotate = 1;
 
 	document.getElementById('x-move').value = 5;
 	document.getElementById('y-move').value = 5;
@@ -116,34 +123,109 @@ const reset = () => {
 };
 
 const draw = context => {
-	const { lineWidth, strokeColor, opacity } = drawParameters;
+	const {
+		lineWidth,
+		strokeColor,
+		opacity
+	} = drawParameters;
 
 	context.lineWidth = lineWidth;
-	context.strokeStyle = strokeColor || 'black';
 	context.globalAlpha = opacity;
+	context.strokeStyle = strokeColor || 'black';
 	
-	const newX = drawParameters.currentX;
-	const newY = drawParameters.currentY;
-
-	if (newX > (width - lineWidth) || newX < lineWidth) {
-		drawParameters.xDirection = drawParameters.xDirection * -1;
-	}
-	
-	if (newY > (height - lineWidth) || newY < lineWidth) {
-		drawParameters.yDirection = drawParameters.yDirection * -1;
-	}
-	
-	drawParameters.currentX = newX + drawParameters.xDirection;
-	drawParameters.currentY = newY + drawParameters.yDirection;
-
-	if (drawParameters.curved) {
-		drawCurveTo(context, { x: newX, y: newY }, { x: drawParameters.currentX, y: drawParameters.currentY });
-	}
-	else {
-		drawLineTo(context, { x: newX, y: newY }, { x: drawParameters.currentX, y: drawParameters.currentY });
+	for(let i = 0; i < 3; i++) {
+		drawTheShit(context);
 	}
 
 	currentAnimationFrameRequest = requestAnimationFrame(draw.bind(this, context));
+	// context.save();
+	
+	// const circleMidX = circleStartX + circleRadius;
+	// const circleMidY = circleStartY + circleRadius;
+	
+	// context.translate(circleMidX, circleMidY);
+	// const rotateAngle = (rotate / 180) * Math.PI;
+	// context.rotate(rotateAngle);
+
+	// if (rotate >= 360) {
+	// 	rotate = 0;
+	// }
+	
+	// rotate += 2;
+	// drawLineTo(context, {x: pencilOffset, y: 0 }, {x: pencilOffset + 1,  y: 0});
+
+	// const {nextX, nextY} = getNextPosition(circleStartX, circleStartY);
+	// drawParameters.circleStartX = nextX;
+	// drawParameters.circleStartY = nextY;
+	
+	// context.restore();
+
+};
+
+const drawTheShit = (context) => {
+	const {
+		circleRadius,
+		circleStartX,
+		circleStartY,
+		pencilOffset
+	} = drawParameters;
+
+	context.save();
+	
+	const circleMidX = circleStartX + circleRadius;
+	const circleMidY = circleStartY + circleRadius;
+	
+	context.translate(circleMidX, circleMidY);
+	const rotateAngle = (rotate / 180) * Math.PI;
+	context.rotate(rotateAngle);
+
+	
+	rotate += 12;
+	if (rotate >= 360) {
+		rotate = 0;
+	}
+
+	drawLineTo(context, {x: 0, y: 0 }, {x: 10,  y: 0});
+
+	const {nextX, nextY} = getNextPosition(circleStartX, circleStartY);
+	drawParameters.circleStartX = nextX;
+	drawParameters.circleStartY = nextY;
+	
+	context.restore();
+};
+
+const getNextPosition = (x, y) => {
+	const { direction, circleRadius } = drawParameters;
+	const maxX = width - (circleRadius * 2);
+	const maxY = height - (circleRadius * 2);
+	const incrementValue = 3;
+	let nextX = x;
+	let nextY = y;
+	if (direction === 1) {
+		if (x < maxX && y === 0) {
+			nextX = x + incrementValue;
+		}
+		if (y < height && x >= maxX) {
+			nextY = y + incrementValue;
+		}
+	}
+	else {
+		if (x > 0 && y >= maxY) {
+			nextX = x - incrementValue;
+		}
+		if (y > 0 && x <= 0) {
+			nextY = y - incrementValue;
+		}
+	}
+
+	if (x >= maxX && y >= maxY) {
+		drawParameters.direction = -1;
+	}
+	if (x <= 0 && y <= 0) {
+		drawParameters.direction = 1;
+	}
+
+	return { nextX, nextY };
 };
 
 const drawLineTo = (context, start, end) => {
@@ -151,6 +233,14 @@ const drawLineTo = (context, start, end) => {
 	context.moveTo(start.x, start.y);
 	context.lineTo(end.x, end.y);
 	context.stroke();
+	context.closePath();
+};
+
+const drawCircle = (context, { x, y }, radius) => {
+	context.beginPath();
+	context.arc(x, y, radius, 0, Math.PI * 2);
+	context.stroke();
+
 	context.closePath();
 };
 
@@ -179,7 +269,7 @@ const drawCurveTo = (context, start, end) => {
 	context.stroke();
 	context.closePath();
 
-	drawParameters.curveMultiplier = drawParameters.curveMultiplier * -1;
+	// drawParameters.curveMultiplier = drawParameters.curveMultiplier * -1;
 };
 
 document.addEventListener('DOMContentLoaded', main);
