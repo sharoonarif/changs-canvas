@@ -11,7 +11,6 @@ const start = () => {
 	if (currentAnimationFrameRequest) {
 		return;
 	}
-
 	draw(getContext());
 };
 
