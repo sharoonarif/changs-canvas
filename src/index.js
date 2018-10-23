@@ -3,33 +3,47 @@ const main = () => {
 	const canvas = document.getElementById('changs-canvas');
 	canvas.width = canvas.clientWidth;
 	canvas.height = canvas.clientHeight;
+	const otherCanvas = document.getElementById('changs-other-canvas');
+	otherCanvas.width = canvas.clientWidth;
+	otherCanvas.height = canvas.clientHeight;
 	width = canvas.clientWidth;
 	height = canvas.clientHeight;
 	outerCircleRadius = height / 2;
 	reset();
 };
 
-const draw = context => {
+const multiplier = 8;
+
+let activated = false;
+
+const draw = (topLayer, bottomLayer) => {
 	const {
 		lineWidth,
 		strokeColor,
-		opacity
+		opacity,
+		overallSpeed,
+		hideStencils
 	} = drawParameters;
 
 	//TODO: 
 	// Add canvas "layers", 1 for the 3 main circles with rotation
 	// and one on top (css with z-index) for the actual line. should be aite
 
-	context.lineWidth = lineWidth;
-	context.globalAlpha = opacity;
-	context.strokeStyle = strokeColor || 'black';
+	topLayer.lineWidth = lineWidth;
+	topLayer.globalAlpha = opacity;
+	topLayer.strokeStyle = 'black';
 	
-	context.clearRect(0, 0, width, height);
+	topLayer.clearRect(0, 0, width, height);
 
-	drawOuterCircle(context);
-	drawTheShit(context);
+	if (!hideStencils) {
+		drawOuterCircle(topLayer);
+	}
 
-	currentAnimationFrameRequest = requestAnimationFrame(draw.bind(this, context));
+	for(let i = 0; i < overallSpeed * multiplier; i++) {
+		drawTheShit(topLayer, bottomLayer);
+	}
+
+	currentAnimationFrameRequest = requestAnimationFrame(draw.bind(this, topLayer, bottomLayer));
 };
 
 const drawOuterCircle = (context) => {
@@ -40,41 +54,75 @@ const drawOuterCircle = (context) => {
 	context.restore();
 };
 
-const drawTheShit = (context) => {
+const drawTheShit = (topLayer, bottomLayer) => {
 	const {
 		circleStartX,
 		circleStartY,
+		innerSpeed,
+		outerSpeed,
+		strokeColor,
+		innerCircleRadius,
+		pencilOffset,
+		hideStencils
 	} = drawParameters;
 
-	context.save();
+	const calculatedPencilOffset = innerCircleRadius * (pencilOffset / 100);
 
-	const circleMidX = outerCircleRadius - innerCircleRadius;
+	topLayer.save();
+	bottomLayer.save();
+	const circleMidX =  outerCircleRadius - innerCircleRadius;
 	const circleMidY = 0;
-	
-	context.translate(width / 2, height / 2);
+
+	topLayer.translate(width / 2, height / 2);
+	bottomLayer.translate(width / 2, height / 2);
 	const rotateAngle = (rotate / 180) * Math.PI;
-	context.rotate(rotateAngle);
-	drawCircle(context, circleMidX, circleMidY, innerCircleRadius);
-	
-	context.translate(circleMidX, circleMidY);
+	topLayer.rotate(rotateAngle);
+	bottomLayer.rotate(rotateAngle);
+	topLayer.strokeStyle = 'white';
+	if (!hideStencils) {
+		drawCircle(topLayer, circleMidX, circleMidY, innerCircleRadius);
+	}
+
+	topLayer.translate(circleMidX, circleMidY);
+	bottomLayer.translate(circleMidX, circleMidY);
 	const rotateInnerAngle = (rotateInner / 180) * Math.PI;
-	context.rotate(rotateInnerAngle);
-	drawCircle(context, 56, 0, 4);
+	topLayer.rotate(rotateInnerAngle);
+	bottomLayer.rotate(rotateInnerAngle);
+	topLayer.strokeStyle = 'yellow';
+
+	if (!hideStencils) {
+		drawCircle(topLayer, calculatedPencilOffset, 0, 4);
+	}
+
+	// bottomLayer.lineTo(pencilOffset, 0);
+	// bottomLayer.stroke();
+	
+	// if (activated) {
+	// 	bottomLayer.closePath();
+	// }
+	// activated = true;
+	
+	// bottomLayer.closePath();
+
+	drawCircle(bottomLayer, calculatedPencilOffset, 0, 1);
+	bottomLayer.fillStyle = strokeColor;
+	bottomLayer.fill();
 	
 	const { nextX, nextY } = getNextPosition(circleStartX, circleStartY);
 	drawParameters.circleStartX = nextX;
 	drawParameters.circleStartY = nextY;
-	rotate += 2;
-	rotateInner += 4;
+	rotate += outerSpeed / multiplier;
+	rotateInner += innerSpeed / multiplier;
 	if (rotate >= 360) {
 		rotate = 0;
 	}
 
 	if (rotateInner >= 360) {
-		rotateInner = 0;
+		rotateInner = 1;
 	}
 	
-	context.restore();
+	topLayer.restore();
+	bottomLayer.restore();
 };
 
 const getNextPosition = (x, y) => {

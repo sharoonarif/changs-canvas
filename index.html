@@ -6,31 +6,34 @@
 	</head>
 	<body>
 		<div class="some-app">
-			<h1>I have Changnesia</h1>
 			<div class="controls">
-				<div class="control">
-					<div class="control-label">X:</div>
-					<input id="x-move" value="5" />
-				</div>
-				<div class="control">
-					<div class="control-label">Y:</div>
-					<input id="y-move" pattern="[0-9]{3}" value="5" />
-				</div>
-				<div class="control">
-					<div class="control-label">Line Width:</div>
-					<input id="line-width" pattern="[0-9]{3}" value="1" />
-				</div>
-				<div class="control">
-					<div class="control-label">Curved:</div>
-					<input id="curved" type="checkbox" value="false" />
-				</div>
-				<div id="curve-amount-control" class="control disabled">
-					<div class="control-label">Curve Amount:</div>
-					<input id="curve-amount" type="range" min="0" max="50" step="1" disabled />
-				</div>
 				<div class="control">
 					<div class="control-label">Opacity:</div>
 					<input id="opacity" type="range" min="0" max="1" step="0.01" />
+				</div>
+				<div class="control">
+					<div class="control-label">Overall Speed:</div>
+					<input id="overall-speed" type="range" min="1" max="4" step="1" />
+				</div>
+				<div class="control">
+					<div class="control-label">Outer Speed:</div>
+					<input id="outer-speed" type="range" min="1" max="3" step="0.1" />
+				</div>
+				<div class="control">
+					<div class="control-label">Inner Speed:</div>
+					<input id="inner-speed" type="range" min="2" max="10" step="0.1" />
+				</div>
+				<div class="control">
+					<div class="control-label">Circle Size:</div>
+					<input id="circle-size" type="range" min="50" max="200" step="1" />
+				</div>
+				<div class="control">
+					<div class="control-label">Pencil Point:</div>
+					<input id="pencil-offset" type="range" min="1" max="100" step="1" />
+				</div>
+				<div class="control">
+					<div class="control-label">Hide Stencils:</div>
+					<input id="hide-stencils" type="checkbox" />
 				</div>
 			</div>
 			<div class="control-btns">
@@ -39,7 +42,10 @@
 				<button id="reset-btn">Reset</button>
 				<button id="clear-btn">Clear</button>
 			</div>
-			<canvas id="changs-canvas"></canvas>
+			<div class="canvases">
+				<canvas id="changs-other-canvas"></canvas>
+				<canvas id="changs-canvas"></canvas>
+			</div>
 			<div id="color-picker">
 				<div class="color-box" data-color="blue" style="background-color: blue;"></div>
 				<div class="color-box" data-color="yellow" style="background-color: yellow;"></div>
@@ -52,6 +58,7 @@
 			</div>
 		</div>
 		<script src="src/elementApi.js"></script>
+		<script src="src/pencil.js"></script>
 		<script src="src/spriograph.js"></script>
 		<script src="src/canvasApi.js"></script>
 		<script src="src/index.js"></script>
