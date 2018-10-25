@@ -63,6 +63,7 @@ const drawTheShit = (topLayer, bottomLayer) => {
 		strokeColor,
 		innerCircleRadius,
 		pencilOffset,
+		pencilSize,
 		hideStencils
 	} = drawParameters;
 
@@ -104,7 +105,7 @@ const drawTheShit = (topLayer, bottomLayer) => {
 	
 	// bottomLayer.closePath();
 
-	drawCircle(bottomLayer, calculatedPencilOffset, 0, 1);
+	drawCircle(bottomLayer, calculatedPencilOffset, 0, pencilSize);
 	bottomLayer.fillStyle = strokeColor;
 	bottomLayer.fill();
 	
